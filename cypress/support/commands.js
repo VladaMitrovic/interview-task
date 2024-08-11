@@ -23,3 +23,23 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+import 'cypress-localstorage-commands';
+
+Cypress.Commands.add('logCustomer', () => {
+  cy.request({
+    method: 'POST',
+    url: Cypress.env('login_url'),
+    body: {
+      username: Cypress.env('customer_email'),
+      password: Cypress.env('customer_password'),
+    },
+  })
+    .then((response) => {
+      cy.log(response.body);
+      cy.setLocalStorage('access_token', response.body);
+    })
+    .its('body')
+    .then((identity) => {
+      cy.setLocalStorage('access_token', identity.access_token);
+    });
+});
