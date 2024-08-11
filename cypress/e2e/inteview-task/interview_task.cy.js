@@ -2,13 +2,15 @@ import HomePage from '../pages/homePage';
 import RegistrationPage from '../pages/registrationPage';
 import ProductDetailsPage from '../pages/productDetailsPage';
 import ShippingPage from '../pages/shippingPage';
+import CommonPage from '../pages/commonPage';
 import { faker } from '@faker-js/faker';
 
-describe('TC3 Purchase e2e flow', () => {
+describe('Interview task complete flow', () => {
   const registration = new RegistrationPage();
   const home = new HomePage();
   const productDetails = new ProductDetailsPage();
   const shipping = new ShippingPage();
+  const common = new CommonPage();
   const randomText = faker.string.alpha({ length: { min: 1, max: 20 } });
   const randomNumber = faker.number.int({ min: 5, max: 10 });
   const fakeEmailAddress = faker.internet.email({
@@ -29,45 +31,42 @@ describe('TC3 Purchase e2e flow', () => {
     cy.restoreLocalStorage();
   });
 
-  it('Successfull Registration', () => {
-    cy.visit(Cypress.env('registration_link'));
-    registration.firstNameInputField().type(randomText);
-    registration.lastNameInputField().type(randomText);
-    registration.emailInputField().type(fakeEmailAddress);
-    registration
-      .passwordInputField()
-      .type(Cypress.env('password_for_registration'));
-    registration
-      .passwordConfirmationInputField()
-      .type(Cypress.env('password_for_registration'));
-    registration.createAnAccountButton().scrollIntoView();
-    registration.createAnAccountButton().click();
-    cy.url().should('eq', Cypress.env('account_url'));
-    cy.get('.message-success > div').should(
-      'contain',
-      'Thank you for registering with Main Website Store.'
-    );
-    cy.get('.greet').should('contain', 'Welcome');
+  it('Complete E2E task - covering TC3, TC4 and TC5 ', () => {
+    cy.registerCustomer();
+    // cy.visit(Cypress.env('registration_link'));
+    // registration.firstNameInputField().type(randomText);
+    // registration.lastNameInputField().type(randomText);
+    // registration.emailInputField().type(fakeEmailAddress);
+    // registration
+    //   .passwordInputField()
+    //   .type(Cypress.env('password_for_registration'));
+    // registration
+    //   .passwordConfirmationInputField()
+    //   .type(Cypress.env('password_for_registration'));
+    // registration.createAnAccountButton().scrollIntoView();
+    // registration.createAnAccountButton().click();
+    // cy.url().should('eq', Cypress.env('account_url'));
+    // cy.get('.message-success > div').should(
+    //   'contain',
+    //   'Thank you for registering with Main Website Store.'
+    // );
+    // cy.get('.greet').should('contain', 'Welcome');
 
     // // Search and add products
     home.searchInputField().type('Beaumont Summit Kit');
     home.searchAutocomplete().contains('Beaumont Summit Kit').click();
     home.product().contains('Beaumont Summit Kit').click();
-    cy.get(
-      '.product-info-main > .product-info-price .price-container > .price-wrapper > .price'
-    ).should('contain', '42');
-    cy.get('.swatch-option.text').contains('L').click();
-    cy.get('#option-label-color-93-item-58').click();
+    common.productPagePrice().should('contain', '42');
+    common.productSizeOption().click();
+    common.productColorOptionBeaumont().click();
     productDetails.addToCart().click();
     home.searchInputField().scrollIntoView();
     home.searchInputField().type('Strike Endurance Tee');
     home.searchAutocomplete().contains('Strike Endurance Tee').click();
     home.product().contains('Strike Endurance Tee').click();
-    cy.get(
-      '.product-info-main > .product-info-price .price-container > .price-wrapper > .price'
-    ).should('contain', '39');
-    cy.get('.swatch-option.text').contains('L').click();
-    cy.get('#option-label-color-93-item-49').click();
+    common.productPagePrice().should('contain', '39');
+    common.productSizeOption().click();
+    common.productColorOptionStrike().click();
     productDetails.addToCart().click();
     home.cart().scrollIntoView();
     home.cart().should('be.visible');
@@ -83,7 +82,7 @@ describe('TC3 Purchase e2e flow', () => {
     shipping.shippingAddressInputField().type(randomText);
     cy.intercept({
       method: 'POST',
-      url: 'https://magento.softwaretestingboard.com/rest/default/V1/carts/mine/estimate-shipping-methods',
+      url: Cypress.env('shipping_method_url'),
     }).as('estimateShippingMethod');
     shipping.shippingCityInputField().type(randomText);
     shipping.shippingCountryDropdown().select('Serbia');
@@ -98,6 +97,7 @@ describe('TC3 Purchase e2e flow', () => {
     shipping.shippingPlaceOrderButton().should('be.visible');
 
     // API call
+
     // cy.intercept({
     //   method: 'POST',
     //   url: 'https://magento.softwaretestingboard.com/checkout/onepage/success/',
@@ -108,19 +108,15 @@ describe('TC3 Purchase e2e flow', () => {
     // });
 
     // Order was Success
-    cy.get('.page-title').should('contain', 'Thank you for your purchase!');
-    cy.get('.primary').contains('Continue Shopping').should('be.visible');
-
-    cy.get(
-      ':nth-child(2) > .customer-welcome > .customer-name > .action'
-    ).click();
-    cy.get('.header.links').contains('My Account').click({ force: true });
-
-    cy.get('.items > :nth-child(2) > a').contains('My Orders').click();
-    cy.get('.actions > .view > span').contains('View Order').click();
-    cy.get('.order-status').should('contain', 'Pending');
-    cy.get('.col.price > .price-excluding-tax').eq(0).should('contain', '42');
-    cy.get('.col.price > .price-excluding-tax').eq(1).should('contain', '39');
-    cy.get('.grand_total > .amount').should('contain', '91');
+    common.pageTitleMessage().should('contain', 'Thank you for your purchase!');
+    common.continueShoppingButton().should('be.visible');
+    common.customerDropdownButton().click();
+    common.headerLinkOption().contains('My Account').click({ force: true });
+    common.sideMenuOption().contains('My Orders').click();
+    common.viewOrder().click();
+    common.orderStatus().should('contain', 'Pending');
+    common.productPriceOnOrderPage().eq(0).should('contain', '42');
+    common.productPriceOnOrderPage().eq(1).should('contain', '39');
+    common.grandTotalPrice().should('contain', '91');
   });
 });
