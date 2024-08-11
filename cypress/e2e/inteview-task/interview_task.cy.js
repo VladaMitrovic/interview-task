@@ -32,25 +32,24 @@ describe('Interview task complete flow', () => {
   });
 
   it('Complete E2E task - covering TC3, TC4 and TC5 ', () => {
-    cy.registerCustomer();
-    // cy.visit(Cypress.env('registration_link'));
-    // registration.firstNameInputField().type(randomText);
-    // registration.lastNameInputField().type(randomText);
-    // registration.emailInputField().type(fakeEmailAddress);
-    // registration
-    //   .passwordInputField()
-    //   .type(Cypress.env('password_for_registration'));
-    // registration
-    //   .passwordConfirmationInputField()
-    //   .type(Cypress.env('password_for_registration'));
-    // registration.createAnAccountButton().scrollIntoView();
-    // registration.createAnAccountButton().click();
-    // cy.url().should('eq', Cypress.env('account_url'));
-    // cy.get('.message-success > div').should(
-    //   'contain',
-    //   'Thank you for registering with Main Website Store.'
-    // );
-    // cy.get('.greet').should('contain', 'Welcome');
+    cy.visit(Cypress.env('registration_link'));
+    registration.firstNameInputField().type(randomText);
+    registration.lastNameInputField().type(randomText);
+    registration.emailInputField().type(fakeEmailAddress);
+    registration
+      .passwordInputField()
+      .type(Cypress.env('password_for_registration'));
+    registration
+      .passwordConfirmationInputField()
+      .type(Cypress.env('password_for_registration'));
+    registration.createAnAccountButton().scrollIntoView();
+    registration.createAnAccountButton().click();
+    cy.url().should('eq', Cypress.env('account_url'));
+    cy.get('.message-success > div').should(
+      'contain',
+      'Thank you for registering with Main Website Store.'
+    );
+    cy.get('.greet').should('contain', 'Welcome');
 
     // // Search and add products
     home.searchInputField().type('Beaumont Summit Kit');
